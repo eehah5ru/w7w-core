@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Site.Compilers.Coffee where
+module W7W.Compilers.Coffee where
 
 import           Control.Monad ((>=>))
 

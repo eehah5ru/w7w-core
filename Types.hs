@@ -1,4 +1,4 @@
-module Site.Types where
+module W7W.Types where
 
 import           Hakyll
 

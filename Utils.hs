@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Site.Utils where
+module W7W.Utils where
 
 import System.FilePath.Posix ((</>), takeBaseName)
 

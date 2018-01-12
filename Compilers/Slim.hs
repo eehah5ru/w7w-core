@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Site.Compilers.Slim where
+module W7W.Compilers.Slim where
 
 import qualified Data.Aeson as AE
 import           Data.String.Conversions (convertString)
 import           Hakyll
-import Site.Types
+import W7W.Types
 
 
 

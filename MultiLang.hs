@@ -1,15 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Site.MultiLang where
+module W7W.MultiLang where
 
 import System.FilePath.Posix ((</>))
 import Data.Maybe (fromMaybe)
 
 import Hakyll
 import Hakyll.Core.Util.String (replaceAll)
-import Site.Types
+import W7W.Types
 
-import Site.Utils
+import W7W.Utils
 
 data Locale = RU | EN | UNKNOWN deriving (Show)
 

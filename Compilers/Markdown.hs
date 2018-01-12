@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Site.Compilers.Markdown where
+module W7W.Compilers.Markdown where
 
 import Hakyll
 
