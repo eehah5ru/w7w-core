@@ -7,11 +7,12 @@ import W7W.MultiLang
 import W7W.Compilers.Slim
 import W7W.Utils
 
-staticSlimPageRules :: Identifier -- rootTpl 
+staticSlimPageRules :: Identifier -- rootTpl
                     -> Identifier -- pageTpl
                     -> Context String -- context
                     -> FilePath -- path to page without lang prefix
                     -> Rules ()
+
 staticSlimPageRules rootTpl pageTpl ctx path = do
   matchMultiLang rules' rules' path
   where
@@ -34,8 +35,25 @@ staticPandocPageRules :: Identifier -- root template
 staticPandocPageRules rootTpl pageTpl ctx path = do
   matchMultiLang rules' rules' path
   where
-    rules' locale = do 
+    rules' locale = do
       route $ setExtension "html"
-      compile $ pandocCompiler 
-        >>= applyTemplateSnapshot pageTpl ctx 
+      compile $ pandocCompiler
+        >>= applyTemplateSnapshot pageTpl ctx
+        >>= applyTemplateSnapshot rootTpl ctx
+
+--
+-- statci html page
+--
+staticHtmlPageRules :: Identifier -- root template
+                    -> Identifier -- page template
+                    -> Context String -- context
+                    -> FilePath -- path to page
+                    -> Rules ()
+staticHtmlPageRules rootTpl pageTpl ctx path = do
+  matchMultiLang rules' rules' path
+  where
+    rules' locale = do
+      route $ setExtension "html"
+      compile $ getResourceBody
+        >>= applyTemplateSnapshot pageTpl ctx
         >>= applyTemplateSnapshot rootTpl ctx
