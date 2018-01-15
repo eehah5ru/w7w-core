@@ -22,3 +22,20 @@ staticSlimPageRules rootTpl pageTpl ctx path = do
               >>= applyTemplateSnapshot pageTpl ctx
               >>= applyTemplateSnapshot rootTpl ctx
               -- >>= relativizeUrls
+
+--
+-- pandoc compilible static page
+--
+staticPandocPageRules :: Identifier -- root template
+                      -> Identifier -- page template
+                      -> Context String -- context
+                      -> FilePath -- path to page
+                      -> Rules ()
+staticPandocPageRules rootTpl pageTpl ctx path = do
+  matchMultiLang rules' rules' path
+  where
+    rules' locale = do 
+      route $ setExtension "html"
+      compile $ pandocCompiler 
+        >>= applyTemplateSnapshot pageTpl ctx 
+        >>= applyTemplateSnapshot rootTpl ctx
