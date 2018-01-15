@@ -28,3 +28,16 @@ identifierPathParts i = splitAll "/" (toFilePath i)
 
 loadImages :: Pattern -> Compiler [Item CopyFile]
 loadImages = loadAll
+
+--
+--
+-- template utils
+--
+--
+applyTemplateSnapshot tplPattern cx i = do
+  t <- loadSnapshotBody tplPattern "template"
+  applyTemplate t cx i
+
+applyTemplateSnapshotList tplPattern cx is = do
+  t <- loadSnapshotBody tplPattern "template"
+  applyTemplateList t cx is
