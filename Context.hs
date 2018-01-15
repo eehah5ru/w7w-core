@@ -49,12 +49,6 @@ boolFieldM name f = field name $ \i -> do
 --
 --
 
-
-fieldRootUrl =
-  field "root_url" getRootUrl
-  where
-    getRootUrl i = return $ "/" ++ (itemLang i) ++ "/" ++ (itemYear i) ++ "/"
-
 fieldCanonicalName = field "canonical_name" $ return . itemCanonicalName
 
 fieldLang = field "lang" $ return . itemLang
