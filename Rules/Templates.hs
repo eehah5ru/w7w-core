@@ -7,7 +7,8 @@ import W7W.Compilers.Slim
 
 templatesRules =
   do
-    match "templates/*.html" $ compile templateCompiler
+    match "templates/*.html" $ compile $ templateCompiler >>= saveSnapshot "template"
+
 
     match "templates/_*.slim" $
       compile getResourceBody
