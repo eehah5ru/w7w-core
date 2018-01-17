@@ -1,0 +1,5 @@
+* infrastructure
+** more complex structure of project
+*** * -> src
+*** todo -> doc
+*** scripts from eeefff-org -> scripts
