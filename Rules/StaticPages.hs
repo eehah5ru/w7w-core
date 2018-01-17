@@ -20,6 +20,7 @@ staticSlimPageRules rootTpl pageTpl ctx path = do
       slimPageRules $ compilers
       where compilers x =
               applyAsTemplate ctx x
+              >>= applyCustomPageTemplateSnapshot ctx
               >>= applyTemplateSnapshot pageTpl ctx
               >>= applyTemplateSnapshot rootTpl ctx
               -- >>= relativizeUrls
@@ -38,6 +39,7 @@ staticPandocPageRules rootTpl pageTpl ctx path = do
     rules' locale = do
       route $ setExtension "html"
       compile $ pandocCompiler
+        >>= applyCustomPageTemplateSnapshot ctx
         >>= applyTemplateSnapshot pageTpl ctx
         >>= applyTemplateSnapshot rootTpl ctx
 
@@ -55,5 +57,6 @@ staticHtmlPageRules rootTpl pageTpl ctx path = do
     rules' locale = do
       route $ setExtension "html"
       compile $ getResourceBody
+        >>= applyCustomPageTemplateSnapshot ctx
         >>= applyTemplateSnapshot pageTpl ctx
         >>= applyTemplateSnapshot rootTpl ctx

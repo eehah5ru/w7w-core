@@ -38,6 +38,14 @@ applyTemplateSnapshot tplPattern cx i = do
   t <- loadSnapshotBody tplPattern "template"
   applyTemplate t cx i
 
+
 applyTemplateSnapshotList tplPattern cx is = do
   t <- loadSnapshotBody tplPattern "template"
   applyTemplateList t cx is
+
+applyCustomPageTemplateSnapshot :: Context String -> Item String -> Compiler (Item String)
+applyCustomPageTemplateSnapshot ctx i = do
+  mTpl <- getMetadataField (itemIdentifier i) "template"
+  case mTpl of
+    Just tpl -> applyTemplateSnapshot (fromFilePath tpl) ctx i
+    Nothing -> return i
