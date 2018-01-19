@@ -26,9 +26,6 @@ itemPathParts = identifierPathParts . itemIdentifier
 identifierPathParts :: Identifier -> [String]
 identifierPathParts i = splitAll "/" (toFilePath i)
 
-loadImages :: Pattern -> Compiler [Item CopyFile]
-loadImages = loadAll
-
 --
 --
 -- template utils
