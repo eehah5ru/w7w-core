@@ -50,6 +50,9 @@ localizePath :: Locale -> String -> String
 localizePath l [] = (toLang l) ++ "/"
 localizePath l path = (toLang l) </> path
 
+localizePattern :: Locale -> Pattern -> Pattern
+localizePattern l p = undefined
+
 localizeField :: Locale -> String -> String
 localizeField l f = f ++ "_" ++ (toLang l)
 
