@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module W7W.MultiLang where
 
@@ -13,10 +14,20 @@ import W7W.Utils
 
 data Locale = RU | EN | UNKNOWN deriving (Show)
 
+
+class Localized a b where
+  localize :: Locale -> a -> Maybe b
+
+class IsLocalized a where
+  isLocalized :: Locale -> a -> Bool
+
 fromLang :: String -> Locale
 fromLang "ru" = RU
 fromLang "en" = EN
 fromLang l = error $ unwords ["unknown lang: ", l]
+
+itemLocale :: Item a -> Locale
+itemLocale = fromLang . itemLang
 
 toLang :: Locale -> String
 toLang RU = "ru"
