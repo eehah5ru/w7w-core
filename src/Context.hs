@@ -61,6 +61,6 @@ fieldRevision = field "revision" getRevision
 --
 --
 
-fieldCanonicalName = field "canonical_name" $ return . itemCanonicalName
+fieldCanonicalName = field "canonicalName" $ return . itemCanonicalName
 
 fieldLang = field "lang" $ return . itemLang

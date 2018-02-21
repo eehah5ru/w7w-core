@@ -17,7 +17,7 @@ import W7W.MultiLang (localize, itemLocale, isLocalized, Localized, IsLocalized)
 
 fieldHasPictures :: (Item a -> Pattern) -> Context a
 fieldHasPictures pPattern =
-  boolFieldM "has_pictures" (hasPictures  pPattern)
+  boolFieldM "hasPictures" (hasPictures  pPattern)
 
 fieldPictures :: (Item a -> Pattern) -> Context a
 fieldPictures pPattern = listFieldWith "pictures" mkPictureItem (loadPictures' pPattern)
@@ -52,14 +52,14 @@ fieldPictures pPattern = listFieldWith "pictures" mkPictureItem (loadPictures' p
     hasExifInfo i = fmap (any id) . sequence $ [hasPictureTitle i, hasPictureCreator i, hasPictureDescription i]
 
     mkPictureItem =
-      field "picture_url" pictureUrl
-      <> field "picture_title" pictureTitle
-      <> boolFieldM "has_picture_title" hasPictureTitle
-      <> field "picture_description" pictureDesciption
-      <> boolFieldM "has_picture_description" hasPictureDescription
-      <> field "picture_creator" pictureCreator
-      <> boolFieldM "has_picture_creator" hasPictureCreator
-      <> boolFieldM "has_exif_info" hasExifInfo
+      field "pictureUrl" pictureUrl
+      <> field "pictureTitle" pictureTitle
+      <> boolFieldM "hasPictureTitle" hasPictureTitle
+      <> field "pictureDescription" pictureDesciption
+      <> boolFieldM "hasPictureDescription" hasPictureDescription
+      <> field "pictureCreator" pictureCreator
+      <> boolFieldM "hasPictureCreator" hasPictureCreator
+      <> boolFieldM "hasExifInfo" hasExifInfo
 
 
 fieldFunctionPictureUrl :: (Item a -> Pattern) -> Context a

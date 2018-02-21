@@ -85,12 +85,12 @@ otherLang l = case l of
 
 fieldOtherLang :: Context String
 fieldOtherLang =
-  field "other_lang" (return . otherLang . itemLang)
+  field "otherLang" (return . otherLang . itemLang)
 
 
 fieldOtherLangUrl :: Context String
 fieldOtherLangUrl =
-  field "other_lang_url" getOtherLangUrl
+  field "otherLangUrl" getOtherLangUrl
   where
     getOtherLangUrl i = do
       u <- return . fromMaybe "/not-found.html" =<< getRoute =<< (return . itemIdentifier) i
@@ -110,7 +110,7 @@ multiLangUrlField lang fromLang = field fieldName (\x -> getUrl fromLang x >>= r
   where notFoundPage :: String -> String
         notFoundPage lang = (lang ++ "/2017/404.html")
 
-        fieldName = lang ++ "_url"
+        fieldName = lang ++ "Url"
 
         getUrl :: String -> Item a -> Compiler String
         getUrl langPrefix i = return (itemIdentifier i)
