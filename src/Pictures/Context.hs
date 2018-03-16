@@ -29,14 +29,18 @@ fieldPictures pPattern = listFieldWith "pictures" mkPictureItem (loadPictures' p
 
     pictureUrl (Item _ (i, pic, ei)) = fmap (maybe "" toUrl) . getRoute . itemIdentifier $ pic
 
+    escapeHtml = T.unpack . T.replace "\"" "&Prime;" . T.pack
+
     exifField :: (Localized a T.Text) => (ExifInfo -> a) -> T.Text -> Item b -> ExifInfo -> Compiler String
-    exifField f missingText i ei = return . T.unpack . maybe missingText id . localize (itemLocale i) . f $ ei
+    exifField f missingText i ei = return . escapeHtml . T.unpack . maybe missingText id . localize (itemLocale i) . f $ ei
+
 
     hasExifField :: (IsLocalized a) => (ExifInfo -> a) -> Item b -> ExifInfo -> Compiler Bool
     hasExifField f i ei = return . isLocalized (itemLocale i) . f $ ei
 
     pictureTitle :: Item (Item a, Item b, ExifInfo) -> Compiler String
     pictureTitle (Item _ (i, _, ei)) = exifField eiTitle "No Title" i ei
+
 
     hasPictureTitle :: Item (Item a, Item b, ExifInfo) -> Compiler Bool
     hasPictureTitle (Item _ (i, _, ei)) = hasExifField eiTitle i ei
