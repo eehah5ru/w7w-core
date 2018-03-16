@@ -6,6 +6,7 @@ import Hakyll
 import W7W.MultiLang
 import W7W.Compilers.Slim
 import W7W.Utils
+import W7W.Typography
 
 staticSlimPageRules :: Identifier -- rootTpl
                     -> Maybe Identifier -- rootPageTpl
@@ -43,6 +44,7 @@ staticPandocPageRules rootTpl mRootPageTpl mPageTpl ctx path = do
     rules' locale = do
       route $ setExtension "html"
       compile $ pandocCompiler
+        >>= beautifyTypography
         >>= applyCustomPageTemplateSnapshot ctx
         >>= applyMaybeTemplateSnapshot mPageTpl ctx
         >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
