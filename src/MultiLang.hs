@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module W7W.MultiLang where
 
@@ -13,10 +14,20 @@ import W7W.Utils
 
 data Locale = RU | EN | UNKNOWN deriving (Show)
 
+
+class Localized a b where
+  localize :: Locale -> a -> Maybe b
+
+class IsLocalized a where
+  isLocalized :: Locale -> a -> Bool
+
 fromLang :: String -> Locale
 fromLang "ru" = RU
 fromLang "en" = EN
 fromLang l = error $ unwords ["unknown lang: ", l]
+
+itemLocale :: Item a -> Locale
+itemLocale = fromLang . itemLang
 
 toLang :: Locale -> String
 toLang RU = "ru"
@@ -50,6 +61,9 @@ localizePath :: Locale -> String -> String
 localizePath l [] = (toLang l) ++ "/"
 localizePath l path = (toLang l) </> path
 
+localizePattern :: Locale -> Pattern -> Pattern
+localizePattern l p = undefined
+
 localizeField :: Locale -> String -> String
 localizeField l f = f ++ "_" ++ (toLang l)
 
@@ -71,12 +85,12 @@ otherLang l = case l of
 
 fieldOtherLang :: Context String
 fieldOtherLang =
-  field "other_lang" (return . otherLang . itemLang)
+  field "otherLang" (return . otherLang . itemLang)
 
 
 fieldOtherLangUrl :: Context String
 fieldOtherLangUrl =
-  field "other_lang_url" getOtherLangUrl
+  field "otherLangUrl" getOtherLangUrl
   where
     getOtherLangUrl i = do
       u <- return . fromMaybe "/not-found.html" =<< getRoute =<< (return . itemIdentifier) i
@@ -96,7 +110,7 @@ multiLangUrlField lang fromLang = field fieldName (\x -> getUrl fromLang x >>= r
   where notFoundPage :: String -> String
         notFoundPage lang = (lang ++ "/2017/404.html")
 
-        fieldName = lang ++ "_url"
+        fieldName = lang ++ "Url"
 
         getUrl :: String -> Item a -> Compiler String
         getUrl langPrefix i = return (itemIdentifier i)

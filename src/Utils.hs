@@ -35,6 +35,10 @@ applyTemplateSnapshot tplPattern cx i = do
   t <- loadSnapshotBody tplPattern "template"
   applyTemplate t cx i
 
+applyMaybeTemplateSnapshot mTplPattern cx i = do
+  case mTplPattern of
+    Just tpl -> applyTemplateSnapshot tpl cx i
+    _ -> return i
 
 applyTemplateSnapshotList tplPattern cx is = do
   t <- loadSnapshotBody tplPattern "template"
