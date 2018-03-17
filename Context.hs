@@ -49,8 +49,8 @@ fieldRevision = field "revision" getRevision
   where
     getRevision i = do
       rev <- unixFilter "git" ["rev-parse", "HEAD"] ""
-      isDirty <- unixFilter "scripts/check-repo-is-clean.sh" [] ""
-      randomNumber <- unixFilter "scripts/repo-md5-changes.sh" [] ""
+      isDirty <- unixFilter "w7w/scripts/check-repo-is-clean.sh" [] ""
+      randomNumber <- unixFilter "w7w/scripts/repo-md5-changes.sh" [] ""
       case isDirty of
         "clean" -> return rev
         "dirty" -> return randomNumber
