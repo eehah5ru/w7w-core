@@ -2,7 +2,11 @@
 module W7W.Rules.StaticPages where
 
 import Hakyll
+import Hakyll.Web.Pandoc
 
+import Data.Monoid ((<>))
+import Text.Pandoc.Options
+import Text.Pandoc.Extensions
 import W7W.MultiLang
 import W7W.Compilers.Slim
 import W7W.Utils
@@ -43,7 +47,7 @@ staticPandocPageRules rootTpl mRootPageTpl mPageTpl ctx path = do
   where
     rules' locale = do
       route $ setExtension "html"
-      compile $ pandocCompiler
+      compile $ customPandocCompiler
         >>= beautifyTypography
         >>= applyCustomPageTemplateSnapshot ctx
         >>= applyMaybeTemplateSnapshot mPageTpl ctx
@@ -69,3 +73,22 @@ staticHtmlPageRules rootTpl mRootPageTpl mPageTpl ctx path = do
         >>= applyMaybeTemplateSnapshot mPageTpl ctx
         >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
         >>= applyTemplateSnapshot rootTpl ctx
+
+
+customPandocCompiler :: Compiler (Item String)
+customPandocCompiler = pandocCompilerWith customReaderOptions defaultHakyllWriterOptions
+    where customReaderOptions = def { readerExtensions = extraReaderExts <> customReaderExts }
+          extraReaderExts = extensionsFromList
+                              [Ext_auto_identifiers
+                              ,Ext_ascii_identifiers
+                              ,Ext_emoji
+                              ,Ext_backtick_code_blocks
+                              ,Ext_footnotes
+                              ,Ext_fenced_divs
+                              ,Ext_bracketed_spans
+                              ,Ext_link_attributes
+                              ,Ext_native_divs
+                              ,Ext_native_spans
+                              ,Ext_raw_html
+                              ,Ext_smart]
+          customReaderExts = disableExtension Ext_implicit_figures $ pandocExtensions
