@@ -45,16 +45,20 @@ boolFieldM name f = field name $ \i -> do
 
 
 -- TODO: slow version. runs for every item. replace with mkFieldRevision and mkSiteContext
-fieldRevision = field "revision" getRevision
+mkFieldRevision :: Compiler (Context a)
+mkFieldRevision = 
+  do
+    r <- getRevision
+    return $ field "revision" (return . const r) --(\_ -> return r)
   where
-    getRevision i = do
-      rev <- unixFilter "git" ["rev-parse", "HEAD"] ""
-      isDirty <- unixFilter "w7w/scripts/check-repo-is-clean.sh" [] ""
-      randomNumber <- unixFilter "w7w/scripts/repo-md5-changes.sh" [] ""
-      case isDirty of
-        "clean" -> return rev
-        "dirty" -> return randomNumber
-        _ -> return randomNumber
+    getRevision = do
+     rev <- unixFilter "git" ["rev-parse", "HEAD"] ""
+     isDirty <- unixFilter "w7w/scripts/check-repo-is-clean.sh" [] ""
+     randomNumber <- unixFilter "w7w/scripts/repo-md5-changes.sh" [] ""
+     case isDirty of
+       "clean" -> return rev
+       "dirty" -> return randomNumber
+       _ -> return randomNumber
 --
 --
 -- fields

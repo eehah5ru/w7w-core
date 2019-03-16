@@ -12,6 +12,29 @@ import W7W.Compilers.Slim
 import W7W.Utils
 import W7W.Typography
 
+
+
+staticSlimPageRulesM :: Identifier -- rootTpl
+                     -> Maybe Identifier -- rootPageTpl
+                     -> Maybe Identifier -- pageTpl
+                     -> Compiler (Context String) -- context
+                     -> FilePath -- path to page without lang prefix
+                     -> Rules ()
+staticSlimPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
+  matchMultiLang rules' rules' path
+  where
+    rules' locale =
+      slimPageRules $ compilers
+      where
+        compilers x = do
+          ctx <- ctxM
+          applyAsTemplate ctx x
+            >>= applyCustomPageTemplateSnapshot ctx
+            >>= applyMaybeTemplateSnapshot mPageTpl ctx
+            >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
+            >>= applyTemplateSnapshot rootTpl ctx
+            -- >>= relativizeUrls
+          
 staticSlimPageRules :: Identifier -- rootTpl
                     -> Maybe Identifier -- rootPageTpl
                     -> Maybe Identifier -- pageTpl
@@ -20,59 +43,59 @@ staticSlimPageRules :: Identifier -- rootTpl
                     -> Rules ()
 
 staticSlimPageRules rootTpl mRootPageTpl mPageTpl ctx path = do
-  matchMultiLang rules' rules' path
-  where
-    rules' locale =
-      slimPageRules $ compilers
-      where
-        compilers x =
-          applyAsTemplate ctx x
-          >>= applyCustomPageTemplateSnapshot ctx
-          >>= applyMaybeTemplateSnapshot mPageTpl ctx
-          >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
-          >>= applyTemplateSnapshot rootTpl ctx
-          -- >>= relativizeUrls
+  staticSlimPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path
 
 --
 -- pandoc compilible static page
 --
-staticPandocPageRules :: Identifier -- root template
-                      -> Maybe Identifier -- root page template
-                      -> Maybe Identifier -- page specific template
-                      -> Context String -- context
-                      -> FilePath -- path to page
-                      -> Rules ()
-staticPandocPageRules rootTpl mRootPageTpl mPageTpl ctx path = do
+staticPandocPageRulesM :: Identifier -- root template
+                       -> Maybe Identifier -- root page template
+                       -> Maybe Identifier -- page specific template
+                       -> Compiler (Context String) -- context
+                       -> FilePath -- path to page
+                       -> Rules ()
+staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
   matchMultiLang rules' rules' path
   where
     rules' locale = do
       route $ setExtension "html"
-      compile $ customPandocCompiler
-        >>= beautifyTypography
-        >>= applyCustomPageTemplateSnapshot ctx
-        >>= applyMaybeTemplateSnapshot mPageTpl ctx
-        >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
-        >>= applyTemplateSnapshot rootTpl ctx
+      compile $ do
+        ctx <- ctxM
+        customPandocCompiler
+          >>= beautifyTypography
+          >>= applyCustomPageTemplateSnapshot ctx
+          >>= applyMaybeTemplateSnapshot mPageTpl ctx
+          >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
+          >>= applyTemplateSnapshot rootTpl ctx
+
+staticPandocPageRules rootTpl mRootPageTpl mPageTpl ctx path = 
+  staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path
+
 
 --
 -- statci html page
 --
-staticHtmlPageRules :: Identifier -- root template
-                    -> Maybe Identifier -- root page template
-                    -> Maybe Identifier -- page scpecific template
-                    -> Context String -- context
-                    -> FilePath -- path to page
-                    -> Rules ()
-staticHtmlPageRules rootTpl mRootPageTpl mPageTpl ctx path = do
+staticHtmlPageRulesM :: Identifier -- root template
+                     -> Maybe Identifier -- root page template
+                     -> Maybe Identifier -- page scpecific template
+                     -> Compiler (Context String) -- context
+                     -> FilePath -- path to page
+                     -> Rules ()
+staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
   matchMultiLang rules' rules' path
   where
     rules' locale = do
       route $ setExtension "html"
-      compile $ getResourceBody
-        >>= applyCustomPageTemplateSnapshot ctx
-        >>= applyMaybeTemplateSnapshot mPageTpl ctx
-        >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
-        >>= applyTemplateSnapshot rootTpl ctx
+      compile $ do
+        ctx <- ctxM
+        getResourceBody
+          >>= applyCustomPageTemplateSnapshot ctx
+          >>= applyMaybeTemplateSnapshot mPageTpl ctx
+          >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
+          >>= applyTemplateSnapshot rootTpl ctx
+
+staticHtmlPageRules rootTpl mRootPageTpl mPageTpl ctx path =
+  staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path
 
 
 customPandocCompiler :: Compiler (Item String)

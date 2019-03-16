@@ -4,6 +4,7 @@
 module W7W.Pictures.Context where
 
 import Data.Monoid ((<>))
+import Control.Applicative ((<|>))
 import qualified Data.Text as T
 
 import Hakyll
@@ -15,16 +16,30 @@ import W7W.ExifInfo.Types
 import W7W.ExifInfo
 import W7W.MultiLang (localize, itemLocale, isLocalized, Localized, IsLocalized)
 
+import qualified W7W.Cache as Cache
+
 fieldHasPictures :: (Item a -> Pattern) -> Context a
 fieldHasPictures pPattern =
   boolFieldM "hasPictures" (hasPictures  pPattern)
 
-fieldPictures :: (Item a -> Pattern) -> Context a
-fieldPictures pPattern = listFieldWith "pictures" mkPictureItem (loadPictures' pPattern)
+fieldPictures :: Cache.Caches -> (Item a -> Pattern) -> Context a
+fieldPictures caches pPattern = listFieldWith "pictures" mkPictureItem (loadPictures' pPattern)
   where
+    getCachedExifInfo i = do
+      Cache.compilerLookup (Cache.exifInfoCache caches)
+                           (itemIdentifier i)
+                           
+    cacheExifInfo i ei = do
+      Cache.compilerInsert (Cache.exifInfoCache caches)
+                           (itemIdentifier i)
+                           ei
+
+    getExifInfo' i = do
+      (getCachedExifInfo i) <|> (getExifInfo i >>= cacheExifInfo i)
+      
     loadPictures' p i = do
       ps <- loadPictures (p i)
-      exifInfos <- mapM (getExifInfo) ps
+      exifInfos <- mapM (getExifInfo') ps
       mapM (\(pic, ei) -> makeItem (i, pic, ei)) $ zip ps exifInfos
 
     pictureUrl (Item _ (i, pic, ei)) = fmap (maybe "" toUrl) . getRoute . itemIdentifier $ pic
