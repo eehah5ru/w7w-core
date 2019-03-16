@@ -90,5 +90,6 @@ customPandocCompiler = pandocCompilerWith customReaderOptions defaultHakyllWrite
                               ,Ext_native_divs
                               ,Ext_native_spans
                               ,Ext_raw_html
-                              ,Ext_smart]
+                              ,Ext_smart
+                              ,Ext_implicit_figures]
           customReaderExts = disableExtension Ext_implicit_figures $ pandocExtensions
