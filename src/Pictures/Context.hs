@@ -7,6 +7,8 @@ import Data.Monoid ((<>))
 import Control.Applicative ((<|>))
 import qualified Data.Text as T
 
+import System.FilePath.Posix ((</>), takeBaseName, joinPath)
+
 import Hakyll
 
 import W7W.Utils
@@ -86,7 +88,7 @@ fieldFunctionPictureUrl pPattern = functionField "pictureUrl" f
   where
     f :: [String] -> Item a -> Compiler String
     f [] _ = errorNoArgs
-    f [pId] i =  errorUnimplemented
+    f [pId] i =  return $ "/pictures" </> (itemCanonicalPath i) </> (itemCanonicalName i) </> pId
     f args _ = errorManyArgs args
 
 fieldFunctionPictureCaption :: (Item a -> Pattern) -> Context a

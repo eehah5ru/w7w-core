@@ -73,7 +73,7 @@ staticPandocPageRules rootTpl mRootPageTpl mPageTpl ctx path =
 
 
 --
--- statci html page
+-- static html page
 --
 staticHtmlPageRulesM :: Identifier -- root template
                      -> Maybe Identifier -- root page template

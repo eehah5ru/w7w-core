@@ -1,11 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 module W7W.Utils where
 
-import System.FilePath.Posix ((</>), takeBaseName)
+import System.FilePath.Posix ((</>), takeBaseName, joinPath)
+import Data.List (tail)
 
 
 import Hakyll
 
+--
+-- FIXME: move to WHPH engine!!!!
+--
 itemYear :: Item a -> String
 itemYear = flip (!!) 1 . itemPathParts
 
@@ -14,6 +18,9 @@ itemLang = head . itemPathParts
 
 itemCanonicalName :: Item a -> String
 itemCanonicalName = identifierCanonicalName . itemIdentifier
+
+itemCanonicalPath :: Item a -> String
+itemCanonicalPath = joinPath . reverse . tail . reverse . tail . itemPathParts
 
 identifierCanonicalName :: Identifier -> String
 identifierCanonicalName = getCanonicalName . reverse . identifierPathParts
