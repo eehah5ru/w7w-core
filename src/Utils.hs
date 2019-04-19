@@ -1,13 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
 module W7W.Utils where
 
+import qualified Text.Read as TR
+
 import System.FilePath.Posix ((</>), takeBaseName)
 
 
 import Hakyll
 
-itemYear :: Item a -> String
-itemYear = flip (!!) 1 . itemPathParts
+itemYear :: Item a -> Maybe String
+itemYear = fmap show . mIntYear . itemYear'
+  where
+    mIntYear :: String -> Maybe Int
+    mIntYear = TR.readMaybe
+
+    itemYear' :: Item a -> String
+    itemYear' = flip (!!) 1 . itemPathParts
+
+hasItemYear :: Item a -> Bool
+hasItemYear = maybe False (const True) . itemYear
 
 itemLang :: Item a -> String
 itemLang = head . itemPathParts
