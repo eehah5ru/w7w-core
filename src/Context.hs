@@ -12,6 +12,7 @@ import W7W.MultiLang
 
 import W7W.Utils
 
+import qualified W7W.Cache as Cache
 --
 --
 -- utils
@@ -45,12 +46,21 @@ boolFieldM name f = field name $ \i -> do
 
 
 -- TODO: slow version. runs for every item. replace with mkFieldRevision and mkSiteContext
-mkFieldRevision :: Compiler (Context a)
-mkFieldRevision = 
+mkFieldRevision :: Cache.Caches -> Compiler (Context a)
+mkFieldRevision caches = 
   do
-    r <- getRevision
+    r <- getRevision'
     return $ field "revision" (return . const r) --(\_ -> return r)
   where
+    getCachedRevision = do
+      Cache.compilerLookup (Cache.revisionCache caches) "/revision"
+    
+    cacheRevision rev = do
+      Cache.compilerInsert (Cache.revisionCache caches) "/revision" rev
+    
+    getRevision' = do
+     (getCachedRevision) <|> (getRevision >>= cacheRevision)
+     
     getRevision = do
      rev <- unixFilter "git" ["rev-parse", "HEAD"] ""
      isDirty <- unixFilter "w7w/scripts/check-repo-is-clean.sh" [] ""

@@ -12,19 +12,24 @@ import Hakyll
 -- FIXME: move to WHPH engine!!!!
 --
 itemYear :: Item a -> Maybe String
-itemYear = fmap show . mIntYear . itemYear'
+itemYear = identifierYear . itemIdentifier
+
+identifierYear :: Identifier -> Maybe String
+identifierYear = fmap show . mIntYear . idYear'
   where
     mIntYear :: String -> Maybe Int
     mIntYear = TR.readMaybe
-
-    itemYear' :: Item a -> String
-    itemYear' = flip (!!) 1 . itemPathParts
+    idYear' :: Identifier -> String
+    idYear' = flip (!!) 1 . identifierPathParts
 
 hasItemYear :: Item a -> Bool
 hasItemYear = maybe False (const True) . itemYear
 
 itemLang :: Item a -> String
 itemLang = head . itemPathParts
+
+identifierLang :: Identifier -> String
+identifierLang = head . identifierPathParts
 
 itemCanonicalName :: Item a -> String
 itemCanonicalName = identifierCanonicalName . itemIdentifier
