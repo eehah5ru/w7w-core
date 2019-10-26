@@ -30,6 +30,7 @@ staticSlimPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
           ctx <- ctxM
           applyAsTemplate ctx x
             >>= applyCustomPageTemplateSnapshot ctx
+            >>= saveSnapshot "content"
             >>= applyMaybeTemplateSnapshot mPageTpl ctx
             >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
             >>= applyTemplateSnapshot rootTpl ctx
@@ -64,6 +65,7 @@ staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
         customPandocCompiler
           >>= beautifyTypography
           >>= applyCustomPageTemplateSnapshot ctx
+          >>= saveSnapshot "content"
           >>= applyMaybeTemplateSnapshot mPageTpl ctx
           >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
           >>= applyTemplateSnapshot rootTpl ctx
@@ -90,6 +92,7 @@ staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
         ctx <- ctxM
         getResourceBody
           >>= applyCustomPageTemplateSnapshot ctx
+          >>= saveSnapshot "content"
           >>= applyMaybeTemplateSnapshot mPageTpl ctx
           >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
           >>= applyTemplateSnapshot rootTpl ctx

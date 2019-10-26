@@ -71,7 +71,7 @@ localizeField l f = f ++ "_" ++ (toLang l)
 chooseByItemLang :: String -> String -> Item a -> String
 chooseByItemLang r e = chooseByLocale r e . fromLang . itemLang
 
-chooseByLocale :: String -> String -> Locale -> String
+chooseByLocale :: a -> a -> Locale -> a
 chooseByLocale r _ RU = r
 chooseByLocale _ e EN = e
 chooseByLocale _ _ _ = error "unknown locale"

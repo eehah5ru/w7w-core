@@ -1,20 +1,35 @@
 {-# LANGUAGE OverloadedStrings #-}
 module W7W.Utils where
 
+import qualified Text.Read as TR
+
 import System.FilePath.Posix ((</>), takeBaseName, joinPath)
 import Data.List (tail)
-
 
 import Hakyll
 
 --
 -- FIXME: move to WHPH engine!!!!
 --
-itemYear :: Item a -> String
-itemYear = flip (!!) 1 . itemPathParts
+itemYear :: Item a -> Maybe String
+itemYear = identifierYear . itemIdentifier
+
+identifierYear :: Identifier -> Maybe String
+identifierYear = fmap show . mIntYear . idYear'
+  where
+    mIntYear :: String -> Maybe Int
+    mIntYear = TR.readMaybe
+    idYear' :: Identifier -> String
+    idYear' = flip (!!) 1 . identifierPathParts
+
+hasItemYear :: Item a -> Bool
+hasItemYear = maybe False (const True) . itemYear
 
 itemLang :: Item a -> String
 itemLang = head . itemPathParts
+
+identifierLang :: Identifier -> String
+identifierLang = head . identifierPathParts
 
 itemCanonicalName :: Item a -> String
 itemCanonicalName = identifierCanonicalName . itemIdentifier

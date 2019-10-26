@@ -24,7 +24,8 @@ import W7W.ExifInfo.Types
 -- type Cache a = C.Cache String a
 
 data Caches = Caches { pictureColorCache :: C.Cache Identifier Color
-                     , exifInfoCache :: C.Cache Identifier ExifInfo}
+                     , exifInfoCache :: C.Cache Identifier ExifInfo
+                     , revisionCache :: C.Cache Identifier String}
 
 -- class CacheType a b where
 --   getCache :: Caches -> C.Cache a b
@@ -37,7 +38,7 @@ instance Hashable Identifier where
 
 
 newCaches :: IO (Caches)
-newCaches = Caches <$> C.newCache Nothing <*> C.newCache Nothing
+newCaches = Caches <$> C.newCache Nothing <*> C.newCache Nothing <*> C.newCache Nothing
 
 compilerLookup :: (Eq k, Hashable k) => C.Cache k v -> k -> Compiler v
 compilerLookup c k = do
