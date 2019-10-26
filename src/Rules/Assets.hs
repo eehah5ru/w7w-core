@@ -32,16 +32,29 @@ jsRules =
               compile copyFileCompiler
 
 
-cssAndSassRules =
+cssAndSassRules :: Pattern -> [Pattern] -> Rules ()
+cssAndSassRules scssDepsPattern  scssFiles =
   do
-    match "css/_*.scss" $
+    match scssDepsPattern $
       compile getResourceBody
 
-    scssDeps <- makePatternDependency "css/_*.scss"
-    rulesExtraDependencies [scssDeps] $
-      match "css/app.scss" $ do
-        route $ setExtension "css"
-        compile $ sassCompilerWith sassOptions >>= return . fmap compressCss
+    scssDeps <- makePatternDependency scssDepsPattern
+    --
+    -- app
+    --
+    mapM_ (scssRulesWithDeps scssDeps) scssFiles
+
+    --
+    -- all css files
+    --
     match "css/**/*.css" $ do
       route idRoute
       compile compressCssCompiler
+  where
+    scssRulesWithDeps scssDeps p =
+      rulesExtraDependencies [scssDeps] $
+        match p scssRules
+
+    scssRules = do
+      route $ setExtension "css"
+      compile $ sassCompilerWith sassOptions >>= return . fmap compressCss
