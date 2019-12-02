@@ -63,6 +63,7 @@ staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
       compile $ do
         ctx <- ctxM
         customPandocCompiler
+          >>= applyAsTemplate ctx
           >>= beautifyTypography
           >>= applyCustomPageTemplateSnapshot ctx
           >>= saveSnapshot "content"
