@@ -92,6 +92,8 @@ staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
       compile $ do
         ctx <- ctxM
         getResourceBody
+          >>= applyAsTemplate ctx
+          >>= beautifyTypography        
           >>= applyCustomPageTemplateSnapshot ctx
           >>= saveSnapshot "content"
           >>= applyMaybeTemplateSnapshot mPageTpl ctx
