@@ -44,8 +44,14 @@ import W7W.Pictures.Utils
 --       in (replaceExtension path) "jpg"
 
 
-picturesRules :: (Int, Int) -> Pattern -> Rules ()
-picturesRules (w, h) p = do
+copyPicturesRules :: Pattern -> Rules ()
+copyPicturesRules p = do
+  match p $ do
+    route idRoute
+    compile copyFileCompiler
+
+resizePicturesRules :: (Int, Int) -> Pattern -> Rules ()
+resizePicturesRules (w, h) p = do
   match p $ do
     route (customRoute pictureRoute)
     compile $ convertItem

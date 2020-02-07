@@ -1,7 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module W7W.PictureColor
-  (fieldPictureColor)
+  (formatColor
+  , fieldPictureColor)
 where
 
 import Data.ByteString.Lazy (ByteString)
@@ -22,6 +23,14 @@ import qualified W7W.Cache as Cache
 import W7W.PictureColor.Types
 import W7W.PictureColor.Parser
 
+
+formatColor :: Color -> String
+formatColor (SRGB.RGB r g b) = T.unpack $ (T.pack . show) r
+                                   <> T.pack ","
+                                   <> (T.pack . show) g
+                                   <> T.pack ","
+                                   <> (T.pack . show) b
+
 fieldPictureColor :: Cache.Caches 
                   -> String -- field name
                   -> (Item a -> Compiler (Maybe Identifier)) -- picture pattern function
@@ -29,35 +38,40 @@ fieldPictureColor :: Cache.Caches
                   -> (Color -> Color) -- color change function
                   -> Context a
 fieldPictureColor cache fName picturePattern missingColor colorChange =
-  field fName (getPictureColor >=> return . colorChange >=> return . formatColor)
+  field fName f 
   where
-    formatColor (SRGB.RGB r g b) = T.unpack $ (T.pack . show) r
-                                   <> T.pack ","
-                                   <> (T.pack . show) g
-                                   <> T.pack ","
-                                   <> (T.pack . show) b
-                                   
-    getCachedPictureColor pictureItem = do
-      Cache.compilerLookup (Cache.pictureColorCache cache) 
-                           pictureItem
+    f i = return . formatColor $ mkColor 255 0 0
+
+-- fieldPictureColor :: Cache.Caches 
+--                   -> String -- field name
+--                   -> (Item a -> Compiler (Maybe Identifier)) -- picture pattern function
+--                   -> Color -- missing color
+--                   -> (Color -> Color) -- color change function
+--                   -> Context a
+-- fieldPictureColor cache fName picturePattern missingColor colorChange =
+--   field fName (getPictureColor >=> return . colorChange >=> return . formatColor)
+--   where                                   
+--     getCachedPictureColor pictureItem = do
+--       Cache.compilerLookup (Cache.pictureColorCache cache) 
+--                            pictureItem
                            
-    cachePictureColor pictureItem color = do
-      Cache.compilerInsert (Cache.pictureColorCache cache)
-                           pictureItem
-                           color
+--     cachePictureColor pictureItem color = do
+--       Cache.compilerInsert (Cache.pictureColorCache cache)
+--                            pictureItem
+--                            color
 
 
-    getPictureColor' pictureItem = do
-      pH <- pictureHistogram pictureItem
-      case pH of
-        Histogram (c:cs) -> return $ c
-        EmptyHistogram -> return missingColor
+--     getPictureColor' pictureItem = do
+--       pH <- pictureHistogram pictureItem
+--       case pH of
+--         Histogram (c:cs) -> return $ c
+--         EmptyHistogram -> return missingColor
         
-    getPictureColor i = do
-      mPItem <- picturePattern i
-      case mPItem of
-        Just pItem -> (getCachedPictureColor pItem) <|> (getPictureColor' pItem >>= cachePictureColor pItem)
-        Nothing -> return $ missingColor
+--     getPictureColor i = do
+--       mPItem <- picturePattern i
+--       case mPItem of
+--         Just pItem -> (getCachedPictureColor pItem) <|> (getPictureColor' pItem >>= cachePictureColor pItem)
+--         Nothing -> return $ missingColor
 
 
 pictureHistogram :: Identifier -> Compiler Histogram
