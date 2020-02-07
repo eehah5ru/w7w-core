@@ -82,6 +82,14 @@ fieldPictures caches pPattern = listFieldWith "pictures" mkPictureItem (loadPict
       <> boolFieldM "hasPictureCreator" hasPictureCreator
       <> boolFieldM "hasExifInfo" hasExifInfo
 
+--
+-- basePicturesUrl
+--
+fieldBasePicturesUrl :: Context a
+fieldBasePicturesUrl = field "basePicturesUrl" f
+  where
+    f :: Item a -> Compiler String
+    f i = return $ "/pictures" </> (itemCanonicalPath i) </> (itemCanonicalName i)
 
 fieldFunctionPictureUrl :: (Item a -> Pattern) -> Context a
 fieldFunctionPictureUrl pPattern = functionField "pictureUrl" f
