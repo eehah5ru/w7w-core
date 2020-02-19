@@ -5,6 +5,7 @@ module W7W.Context where
 import Control.Applicative (Alternative (..))
 
 import Hakyll
+import Hakyll.Web.Template.Context
 
 import Data.Monoid ((<>), mempty)
 
@@ -35,14 +36,18 @@ withItemMetadata f item = do
   m <- getMetadata (itemIdentifier item)
   return $ f m
 
+field' :: String -> (Item a -> Compiler ContextField) -> Context a
+field' key value = Context $ \k _ i ->
+    if k == key
+        then value i
+        else noResult $ "Tried field " ++ key
 
 boolFieldM :: String -> (Item a -> Compiler Bool) -> Context a
-boolFieldM name f = field name $ \i -> do
+boolFieldM name f = field' name $ \i -> do
                       b <- f i
                       if b
-                        then pure $ error $ unwords $
-                                 ["no string value for bool field:",name]
-                        else empty
+                        then return EmptyField                                
+                        else noResult $ "Field " ++ name ++ " is false"
 
 
 -- TODO: slow version. runs for every item. replace with mkFieldRevision and mkSiteContext
