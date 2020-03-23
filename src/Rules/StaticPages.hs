@@ -21,7 +21,7 @@ staticSlimPageRulesM :: Identifier -- rootTpl
                      -> FilePath -- path to page without lang prefix
                      -> Rules ()
 staticSlimPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
-  matchMultiLang rules' rules' path
+  matchMultiLang rules' rules' path Nothing
   where
     rules' locale =
       slimPageRules $ compilers
@@ -56,7 +56,7 @@ staticPandocPageRulesM :: Identifier -- root template
                        -> FilePath -- path to page
                        -> Rules ()
 staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
-  matchMultiLang rules' rules' path
+  matchMultiLang rules' rules' path Nothing
   where
     rules' locale = do
       route $ setExtension "html"
@@ -85,7 +85,7 @@ staticHtmlPageRulesM :: Identifier -- root template
                      -> FilePath -- path to page
                      -> Rules ()
 staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
-  matchMultiLang rules' rules' path
+  matchMultiLang rules' rules' path Nothing
   where
     rules' locale = do
       route $ setExtension "html"
