@@ -44,14 +44,53 @@ import W7W.Pictures.Utils
 --       in (replaceExtension path) "jpg"
 
 
-copyPicturesRules :: Pattern -> Rules ()
-copyPicturesRules p = do
+data PictureTypeStrategy =
+  PicCopyStrategy
+  | PicResizeStrategy (Int, Int) deriving (Show)
+
+data PicturesRulesConfig =
+  PicturesRulesConfig { pngStrategy :: PictureTypeStrategy
+                      , gifStrategy :: PictureTypeStrategy
+                      , othersStrategy :: PictureTypeStrategy
+                      } deriving (Show)
+
+copyAllPicturesRulesConfig =
+  PicturesRulesConfig { pngStrategy = PicCopyStrategy
+                      , gifStrategy = PicCopyStrategy
+                      , othersStrategy = PicCopyStrategy }
+
+resizeAllPicturesRulesConfig :: (Int, Int) -> PicturesRulesConfig
+resizeAllPicturesRulesConfig size =
+  PicturesRulesConfig { pngStrategy = PicResizeStrategy size
+                      , gifStrategy = PicResizeStrategy size
+                      , othersStrategy = PicResizeStrategy size }
+
+
+picturesRules :: PicturesRulesConfig -> FilePath -> Rules ()
+picturesRules config basePath = do
+  picturesRules' (pngStrategy config) pngPattern
+  picturesRules' (gifStrategy config) gifPattern
+  picturesRules' (othersStrategy config) othersPattern
+  where
+    mkPattern mExt = fromGlob $ basePath </> ("**/*" ++ (maybe "" id mExt))
+    pngPattern = (mkPattern (Just ".png")) .||. (mkPattern (Just ".PNG"))
+    gifPattern = (mkPattern (Just ".gif")) .||. (mkPattern (Just ".GIF"))
+    othersPattern = (fromGlob $ basePath </> "**/*") .&&. (complement (pngPattern .||. gifPattern))
+
+    picturesRules' :: PictureTypeStrategy -> Pattern -> Rules ()
+    picturesRules' PicCopyStrategy = copyPicturesRules'
+    picturesRules' (PicResizeStrategy size) = resizePicturesRules' size 
+
+
+
+copyPicturesRules' :: Pattern -> Rules ()
+copyPicturesRules' p = do
   match p $ do
     route idRoute
     compile copyFileCompiler
 
-resizePicturesRules :: (Int, Int) -> Pattern -> Rules ()
-resizePicturesRules (w, h) p = do
+resizePicturesRules' :: (Int, Int) -> Pattern -> Rules ()
+resizePicturesRules' (w, h) p = do
   match p $ do
     route (customRoute pictureRoute)
     compile $ convertItem
