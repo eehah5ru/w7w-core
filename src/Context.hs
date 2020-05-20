@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
 
 module W7W.Context where
 
@@ -8,6 +9,9 @@ import Hakyll
 import Hakyll.Web.Template.Context
 
 import Data.Monoid ((<>), mempty)
+import           Control.Monad               (liftM)
+import           Data.Ord                    (comparing)
+import           Data.List                   (intersperse, sortBy)
 
 import W7W.MultiLang
 
@@ -19,6 +23,21 @@ import qualified W7W.Cache as Cache
 -- utils
 --
 --
+
+sortByOrder :: MonadMetadata m => [Item a] -> m [Item a]
+sortByOrder =
+  sortByM $ order'
+
+  where
+    order' = withItemMetadata $ getOrder
+
+    getOrder :: Metadata -> String
+    getOrder m =
+      maybe "9999" id (lookupString "order" m)
+
+    sortByM :: (Monad m, Ord k) => (a -> m k) -> [a] -> m [a]
+    sortByM f xs = liftM (map fst . sortBy (comparing snd)) $
+                   mapM (\x -> liftM (x,) (f x)) xs
 
 hasMetadataField :: String -> Metadata -> Bool
 hasMetadataField fName m =

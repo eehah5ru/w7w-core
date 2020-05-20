@@ -1,10 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module W7W.Utils where
 
 import qualified Text.Read as TR
 
 import System.FilePath.Posix ((</>), takeBaseName, joinPath)
 import Data.List (tail)
+
 
 import Hakyll
 
