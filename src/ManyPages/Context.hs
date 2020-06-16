@@ -22,7 +22,7 @@ import W7W.ManyPages
 import qualified W7W.ManyPages.Config as MPC
 
 pagesPattern :: (MonadReader MPC.Config m) => Locale -> m Pattern
-pagesPattern l = asks (MPC.unIndexPagePath . MPC.indexPagePath) >>= return . fromGlob . localizePath l
+pagesPattern l = asks (MPC.unPagesPattern . MPC.pagesPattern) >>= return . fromGlob . localizePath l
 
 loadPages :: (Binary a, Typeable a) => Locale ->  ManyPages Compiler [Item a]
 loadPages l = do
