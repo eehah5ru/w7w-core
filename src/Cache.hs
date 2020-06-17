@@ -5,6 +5,8 @@
 module W7W.Cache
   ( C.Cache (..)
   , Caches (..)
+  , HasCache
+  , getCache
   , newCaches
   , compilerLookup
   , compilerInsert
@@ -26,6 +28,9 @@ import W7W.ExifInfo.Types
 data Caches = Caches { pictureColorCache :: C.Cache Identifier Color
                      , exifInfoCache :: C.Cache Identifier ExifInfo
                      , revisionCache :: C.Cache Identifier String}
+
+class HasCache a where
+  getCache :: a -> Caches
 
 -- class CacheType a b where
 --   getCache :: Caches -> C.Cache a b
