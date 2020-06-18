@@ -32,6 +32,25 @@ data Caches = Caches { pictureColorCache :: C.Cache Identifier Color
 class HasCache a where
   getCache :: a -> Caches
 
+instance HasCache Caches where
+  getCache = id
+
+instance HasCache (Caches, a) where
+  getCache = fst
+
+instance HasCache (a, Caches) where
+  getCache = snd
+
+instance HasCache (Caches, a, b) where
+  getCache (x, _, _)= x
+
+instance HasCache (a, Caches, b) where
+  getCache (_, x, _)= x
+
+instance HasCache (a, b, Caches) where
+  getCache (_, _, x)= x
+
+
 -- class CacheType a b where
 --   getCache :: Caches -> C.Cache a b
 

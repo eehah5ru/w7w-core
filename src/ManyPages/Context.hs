@@ -6,6 +6,7 @@ module W7W.ManyPages.Context where
 import Data.Binary
 import Data.Typeable
 
+import Control.Applicative
 import Control.Monad.Trans.Class
 import Control.Monad.Reader
 
@@ -20,6 +21,7 @@ import W7W.Context (sortByOrder)
 
 import W7W.ManyPages
 import qualified W7W.ManyPages.Config as MPC
+import W7W.ManyPages.Config hiding (pagesPattern)
 
 pagesPattern :: (MonadReader MPC.Config m) => Locale -> m Pattern
 pagesPattern l = asks (MPC.unPagesPattern . MPC.pagesPattern) >>= return . fromGlob . localizePath l
@@ -39,13 +41,6 @@ mkPagesField = do
     f cfg i =
       execManyPages cfg $ loadPages (itemLocale i) >>= lift . sortByOrder
 
---
--- wrapped site ctx
---
-siteCtx :: ManyPages Compiler (Context String)
-siteCtx = do
-  c <- asks MPC.cache
-  lift $ mkSiteCtx c
 
 --
 -- page ctx
@@ -53,7 +48,8 @@ siteCtx = do
 mkPageCtx :: ManyPages Compiler (Context String)
 mkPageCtx = do
   c <- asks MPC.cache
-  lift $ mkSiteCtx c
+  fields' <- asks MPC.pageCtxFields
+  liftA2 (<>) siteCtx fields'
 
 --
 -- index page ctx

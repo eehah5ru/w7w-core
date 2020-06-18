@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module W7W.MultiLang where
 
@@ -21,10 +22,46 @@ class Localized a b where
 class IsLocalized a where
   isLocalized :: Locale -> a -> Bool
 
+--
+-- Multilang type class
+--
+
+
+class Multilang a where
+  type MultilangValue a
+
+  ru :: a -> MultilangValue a
+  en :: a -> MultilangValue a
+
+localizeMaybe :: (Multilang a) => Locale -> a -> Maybe (MultilangValue a)
+localizeMaybe l x =
+  case l of
+    RU -> Just . ru $ x
+    EN -> Just . en $ x
+    _ -> Nothing
+
+
+-- class Multilang2 v a where
+--   -- type MultilangValue a
+
+--   ru2 :: a -> v
+--   en2 :: a -> v
+
+-- class Multilang3 a where
+--   type MultilangValue3 a
+
+--   ru3 :: a -> MultilangValue3 a
+--   en3 :: a -> MultilangValue3 a
+
 fromLang :: String -> Locale
 fromLang "ru" = RU
 fromLang "en" = EN
 fromLang l = error $ unwords ["unknown lang: ", l]
+
+fromLangMaybe :: String -> Maybe Locale
+fromLangMaybe "ru" = Just RU
+fromLangMaybe "en" = Just EN
+fromLangMaybe l = Nothing
 
 itemLocale :: Item a -> Locale
 itemLocale = fromLang . itemLang

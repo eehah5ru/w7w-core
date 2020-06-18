@@ -18,21 +18,58 @@ import W7W.ExifInfo.Types
 import W7W.ExifInfo
 import W7W.MultiLang (localize, itemLocale, isLocalized, Localized, IsLocalized)
 
-import qualified W7W.Cache as Cache
 
+import qualified W7W.Cache as Cache
+import W7W.Labels.Types
+
+
+--
+--
+-- fields
+--
+--
+
+--
+-- Cover
+--
+
+type CoverPattern a = Item a -> Pattern
+
+--
+-- field cover
+--
+fieldCover :: String -> CoverPattern String -> Context String
+fieldCover fieldName coverPattern =
+  field fieldName getCoverUrl
+  where
+    missingCoverUrl = "/images/not-found-cover.jpg"
+    coverUrl i = do
+      mR <- getRoute i
+      case mR of
+        Just r -> return $ toUrl r
+        _ -> return missingCoverUrl
+    getCoverUrl i = do
+      covers <- loadAll (coverPattern i) :: Compiler [Item CopyFile]
+      case (null covers) of
+        True -> return missingCoverUrl
+        False -> coverUrl . itemIdentifier . head $ covers
+
+--
+-- has pictures predicate
+--
 fieldHasPictures :: (Item a -> Pattern) -> Context a
 fieldHasPictures pPattern =
   boolFieldM "hasPictures" (hasPictures  pPattern)
 
-fieldPictures :: Cache.Caches -> (Item a -> Pattern) -> Context a
-fieldPictures caches pPattern = listFieldWith "pictures" mkPictureItem (loadPictures' pPattern)
+fieldPictures :: (Cache.HasCache c) => c -> (Item a -> Pattern) -> Context a
+fieldPictures c pPattern = listFieldWith "pictures" mkPictureItem (loadPictures' pPattern)
   where
     getCachedExifInfo i = do
-      Cache.compilerLookup (Cache.exifInfoCache caches)
+      Cache.compilerLookup (Cache.exifInfoCache (Cache.getCache c))
                            (itemIdentifier i)
                            
     cacheExifInfo i ei = do
-      Cache.compilerInsert (Cache.exifInfoCache caches)
+      Cache.compilerInsert (Cache.exifInfoCache (Cache.getCache c))
                            (itemIdentifier i)
                            ei
 
