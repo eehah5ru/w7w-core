@@ -2,7 +2,7 @@
 {-# LANGUAGE TupleSections #-}
 
 module W7W.Context where
-
+import Text.Read
 import Control.Applicative (Alternative (..))
 
 import Hakyll
@@ -31,9 +31,14 @@ sortByOrder =
   where
     order' = withItemMetadata $ getOrder
 
-    getOrder :: Metadata -> String
+    defaultOrder = 9999
+    
+    getOrder :: Metadata -> Int
     getOrder m =
-      maybe "9999" id (lookupString "order" m)
+      maybe defaultOrder id (lookupString "order" m >>= orderToInt)
+
+    orderToInt :: String -> Maybe Int
+    orderToInt s = (readMaybe s) :: Maybe Int
 
     sortByM :: (Monad m, Ord k) => (a -> m k) -> [a] -> m [a]
     sortByM f xs = liftM (map fst . sortBy (comparing snd)) $
