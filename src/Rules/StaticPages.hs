@@ -5,10 +5,9 @@ import Hakyll
 import Hakyll.Web.Pandoc
 
 import Data.Monoid ((<>))
-import Text.Pandoc.Options
-import Text.Pandoc.Extensions
 import W7W.MultiLang
 import W7W.Compilers.Slim
+import W7W.Compilers.Markdown
 import W7W.Utils
 import W7W.Typography
 
@@ -102,23 +101,3 @@ staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
 
 staticHtmlPageRules rootTpl mRootPageTpl mPageTpl ctx path =
   staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path
-
-
-customPandocCompiler :: Compiler (Item String)
-customPandocCompiler = pandocCompilerWith customReaderOptions defaultHakyllWriterOptions
-    where customReaderOptions = def { readerExtensions = extraReaderExts <> customReaderExts }
-          extraReaderExts = extensionsFromList
-                              [Ext_auto_identifiers
-                              ,Ext_ascii_identifiers
-                              ,Ext_emoji
-                              ,Ext_backtick_code_blocks
-                              ,Ext_footnotes
-                              ,Ext_fenced_divs
-                              ,Ext_bracketed_spans
-                              ,Ext_link_attributes
-                              ,Ext_native_divs
-                              ,Ext_native_spans
-                              ,Ext_raw_html
-                              ,Ext_smart
-                              ,Ext_implicit_figures]
-          customReaderExts = disableExtension Ext_implicit_figures $ pandocExtensions

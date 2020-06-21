@@ -43,3 +43,11 @@ withVersionedDeps version dPatterns rules  = do
 rulesWithVersion :: Version -> Rules () -> Rules ()
 rulesWithVersion DefaultVersion rs = rs
 rulesWithVersion TxtVersion rs = version "txt" rs
+
+isHtml :: Version -> Bool
+isHtml TxtVersion = False
+isHtml DefaultVersion = True
+
+isTxt :: Version -> Bool
+isTxt TxtVersion = True
+isTxt DefaultVersion = False
