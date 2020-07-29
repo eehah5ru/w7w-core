@@ -74,12 +74,22 @@ toLang l = error $ unwords ["unknown localizer: ", show l]
 matchMultiLang :: (Locale -> Rules ())
                -> (Locale -> Rules ())
                -> FilePath
+               -> Maybe [FilePath] -- exclude
                -> Rules ()
-matchMultiLang ruRules enRules path =
-  do match ruPages $ ruRules RU
-     match enPages $ enRules EN
-  where ruPages = fromGlob $ localizePath RU path
-        enPages = fromGlob $ localizePath EN path
+matchMultiLang ruRules enRules path excludes =
+  do match (pages RU) $ ruRules RU
+     match (pages EN) $ enRules EN
+  where
+    pattern' l = fromGlob . localizePath l
+    excludes' l Nothing = Nothing
+    excludes' l (Just []) = Nothing
+    excludes' l (Just xs) = Just $ foldl f' (head ps') (tail ps')
+      where
+        ps' = fmap (pattern' l) xs
+        f' r p = r .||. p
+    pages l = case excludes' l excludes of
+                Nothing -> (pattern' l path)
+                Just exs -> (pattern' l path) .&&. (complement exs)
 
 
 bothLangsPattern :: String -> Pattern
@@ -98,8 +108,8 @@ localizePath :: Locale -> String -> String
 localizePath l [] = (toLang l) ++ "/"
 localizePath l path = (toLang l) </> path
 
-localizePattern :: Locale -> Pattern -> Pattern
-localizePattern l p = undefined
+-- localizePattern :: Locale -> Pattern -> Pattern
+-- localizePattern l p = undefined
 
 localizeField :: Locale -> String -> String
 localizeField l f = f ++ "_" ++ (toLang l)
