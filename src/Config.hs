@@ -24,5 +24,6 @@ config =
 --
 sassOptions :: SO.SassOptions
 sassOptions = def { SO.sassIncludePaths = Just [ "css/"
-                                               , "bower_components/foundation-sites/scss/"] 
+                                               , "bower_components/foundation-sites/scss/"
+                                               , "node_modules/foundation-sites/scss/"] 
                   , SO.sassOutputStyle = SO.SassStyleCompressed}
