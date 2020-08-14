@@ -42,7 +42,8 @@ slimCompilerWithEmptyLocals =
 compileSlim :: String -> String -> Compiler String
 compileSlim m = unixFilter "slimrb" [ "-s"
                                        , "-p"
-                                       , "-r ./slimlib.rb"
+                                       , "-r ./slimlib.rb" -- project specific
+                                       , "-r ./w7w/slimlib.rb" -- global slim helpers
                                        ,  "--trace"
                                        , "-l"
                                        , m]
