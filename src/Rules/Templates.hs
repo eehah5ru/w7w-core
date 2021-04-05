@@ -4,6 +4,9 @@ module W7W.Rules.Templates where
 import Hakyll
 
 import W7W.Compilers.Slim
+import W7W.Compilers.Markdown
+import W7W.Utils
+import W7W.Typography
 
 templatesRules =
   do
@@ -21,3 +24,9 @@ templatesRules =
             >>= withItemBody compileSlimWithEmptyLocals
             >>= withItemBody (return . readTemplate)
             >>= saveSnapshot "template"
+
+    match ("templates/*.md") $ do
+      compile $
+        customPandocCompiler
+          >>= withItemBody (return . readTemplate)
+          >>= saveSnapshot "template"
