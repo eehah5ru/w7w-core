@@ -51,18 +51,21 @@ data PictureTypeStrategy =
 data PicturesRulesConfig =
   PicturesRulesConfig { pngStrategy :: PictureTypeStrategy
                       , gifStrategy :: PictureTypeStrategy
+                      , mp4Strategy :: PictureTypeStrategy
                       , othersStrategy :: PictureTypeStrategy
                       } deriving (Show)
 
 copyAllPicturesRulesConfig =
   PicturesRulesConfig { pngStrategy = PicCopyStrategy
                       , gifStrategy = PicCopyStrategy
+                      , mp4Strategy = PicCopyStrategy
                       , othersStrategy = PicCopyStrategy }
 
 resizeAllPicturesRulesConfig :: (Int, Int) -> PicturesRulesConfig
 resizeAllPicturesRulesConfig size =
   PicturesRulesConfig { pngStrategy = PicResizeStrategy size
                       , gifStrategy = PicResizeStrategy size
+                      , mp4Strategy = PicCopyStrategy                      
                       , othersStrategy = PicResizeStrategy size }
 
 
@@ -70,12 +73,14 @@ picturesRules :: PicturesRulesConfig -> FilePath -> Rules ()
 picturesRules config basePath = do
   picturesRules' (pngStrategy config) pngPattern
   picturesRules' (gifStrategy config) gifPattern
+  picturesRules' (mp4Strategy  config) mp4Pattern
   picturesRules' (othersStrategy config) othersPattern
   where
     mkPattern mExt = fromGlob $ basePath </> ("**/*" ++ (maybe "" id mExt))
     pngPattern = (mkPattern (Just ".png")) .||. (mkPattern (Just ".PNG"))
     gifPattern = (mkPattern (Just ".gif")) .||. (mkPattern (Just ".GIF"))
-    othersPattern = (fromGlob $ basePath </> "**/*") .&&. (complement (pngPattern .||. gifPattern))
+    mp4Pattern = (mkPattern (Just ".mp4")) .||. (mkPattern (Just ".MP4"))
+    othersPattern = (fromGlob $ basePath </> "**/*") .&&. (complement (pngPattern .||. gifPattern .||. mp4Pattern))
 
     picturesRules' :: PictureTypeStrategy -> Pattern -> Rules ()
     picturesRules' PicCopyStrategy = copyPicturesRules'
