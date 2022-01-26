@@ -18,9 +18,10 @@ staticSlimPageRulesM :: Identifier -- rootTpl
                      -> Maybe Identifier -- pageTpl
                      -> Compiler (Context String) -- context
                      -> FilePath -- path to page without lang prefix
+                     -> Maybe [FilePath] -- excludes without lang prefix
                      -> Rules ()
-staticSlimPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
-  matchMultiLang rules' rules' path Nothing
+staticSlimPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path excludes = do
+  matchMultiLang rules' rules' path excludes
   where
     rules' locale =
       slimPageRules $ compilers
@@ -40,10 +41,11 @@ staticSlimPageRules :: Identifier -- rootTpl
                     -> Maybe Identifier -- pageTpl
                     -> Context String -- context
                     -> FilePath -- path to page without lang prefix
+                    -> Maybe [FilePath] -- excludes without path prefix
                     -> Rules ()
 
-staticSlimPageRules rootTpl mRootPageTpl mPageTpl ctx path = do
-  staticSlimPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path
+staticSlimPageRules rootTpl mRootPageTpl mPageTpl ctx path excludes = do
+  staticSlimPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path excludes
 
 --
 -- pandoc compilible static page
@@ -53,9 +55,10 @@ staticPandocPageRulesM :: Identifier -- root template
                        -> Maybe Identifier -- page specific template
                        -> Compiler (Context String) -- context
                        -> FilePath -- path to page
+                       -> Maybe [FilePath] -- excludes without prefix
                        -> Rules ()
-staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
-  matchMultiLang rules' rules' path Nothing
+staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path excludes = do
+  matchMultiLang rules' rules' path excludes
   where
     rules' locale = do
       route $ setExtension "html"
@@ -70,8 +73,8 @@ staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
           >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
           >>= applyTemplateSnapshot rootTpl ctx
 
-staticPandocPageRules rootTpl mRootPageTpl mPageTpl ctx path = 
-  staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path
+staticPandocPageRules rootTpl mRootPageTpl mPageTpl ctx path excludes = 
+  staticPandocPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path excludes
 
 
 --
@@ -82,9 +85,10 @@ staticHtmlPageRulesM :: Identifier -- root template
                      -> Maybe Identifier -- page scpecific template
                      -> Compiler (Context String) -- context
                      -> FilePath -- path to page
+                     -> Maybe [FilePath] -- excludes without lang prefix
                      -> Rules ()
-staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
-  matchMultiLang rules' rules' path Nothing
+staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path excludes = do
+  matchMultiLang rules' rules' path excludes
   where
     rules' locale = do
       route $ setExtension "html"
@@ -99,5 +103,5 @@ staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl ctxM path = do
           >>= applyMaybeTemplateSnapshot mRootPageTpl ctx
           >>= applyTemplateSnapshot rootTpl ctx
 
-staticHtmlPageRules rootTpl mRootPageTpl mPageTpl ctx path =
-  staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path
+staticHtmlPageRules rootTpl mRootPageTpl mPageTpl ctx path excludes =
+  staticHtmlPageRulesM rootTpl mRootPageTpl mPageTpl (return ctx) path excludes
