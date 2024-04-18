@@ -3,6 +3,7 @@ module W7W.Compilers.Markdown where
 
 import Hakyll
 
+import Data.Maybe 
 import Hakyll.Web.Pandoc
 import Text.Pandoc
 
@@ -19,14 +20,15 @@ markdownPageRules f = do
   route $ setExtension "html"
   compile $ customPandocCompiler >>= f
 
-markdownPageRules2 :: CompileF -> CompileF -> Rules ()
-markdownPageRules2 beforePandocF afterPandocF = do
-  route $ setExtension "html"
-  compile $
-    getResourceBody
-    >>= beforePandocF
-    >>= customRenderPandoc
-    >>= afterPandocF
+-- FIXME: unused???
+-- markdownPageRules2 :: CompileF -> CompileF -> Rules ()
+-- markdownPageRules2 beforePandocF afterPandocF = do
+--   route $ setExtension "html"
+--   compile $
+--     getResourceBody
+--     >>= beforePandocF
+--     >>= customRenderPandoc
+--     >>= afterPandocF
 
 customReaderOptions = def { readerExtensions = extraReaderExts <> customReaderExts }
   where
@@ -47,13 +49,22 @@ customReaderOptions = def { readerExtensions = extraReaderExts <> customReaderEx
                         ,Ext_implicit_figures]
     customReaderExts = disableExtension Ext_implicit_figures . disableExtension Ext_tex_math_dollars $ pandocExtensions
 
+customWriterOptions :: Metadata -> WriterOptions
+customWriterOptions m =
+  defaultHakyllWriterOptions { writerSectionDivs = sectionDivsEnabled}
+  where
+    -- TODO: make it possible to set false values
+    sectionDivsEnabled = isJust . lookupString "pandocSectionDivs" $ m
 
 
 customPandocCompiler :: Compiler (Item String)
-customPandocCompiler = W7WPandoc.pandocCompilerWith customReaderOptions defaultHakyllWriterOptions
+customPandocCompiler = do
+  m <- getMetadata =<< getUnderlying
+  W7WPandoc.pandocCompilerWith customReaderOptions (customWriterOptions m) 
 
 
-customRenderPandoc = W7WPandoc.renderPandocWith customReaderOptions defaultHakyllWriterOptions
+-- FIXME: unused???
+-- customRenderPandoc = W7WPandoc.renderPandocWith customReaderOptions customRenderPandoc
 
 -- --
 -- -- from here
