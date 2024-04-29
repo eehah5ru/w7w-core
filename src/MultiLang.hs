@@ -73,10 +73,10 @@ toLang l = error $ unwords ["unknown localizer: ", show l]
 
 matchMultiLang :: (Locale -> Rules ())
                -> (Locale -> Rules ())
-               -> FilePath
                -> Maybe [FilePath] -- exclude
+               -> FilePath
                -> Rules ()
-matchMultiLang ruRules enRules path excludes =
+matchMultiLang ruRules enRules excludes path =
   do match (pages RU) $ ruRules RU
      match (pages EN) $ enRules EN
   where

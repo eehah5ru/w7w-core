@@ -21,7 +21,7 @@ indexPageRules cfg = execManyPages cfg $ do
   indexPagePath <- asks (unIndexPagePath . MPC.indexPagePath)
   cfg <- ask
 
-  lift $ matchMultiLang (rules' cfg) (rules' cfg) (indexPagePath) Nothing
+  lift $ matchMultiLang (rules' cfg) (rules' cfg) Nothing (indexPagePath)
 
   where
     rules' :: MPC.Config -> Locale -> Rules ()
@@ -36,7 +36,7 @@ pageRules cfg  = execManyPages cfg $ do
   pagesPattern <- asks (unPagesPattern . MPC.pagesPattern)
   cfg <- ask
 
-  lift $ matchMultiLang (rules' cfg) (rules' cfg) pagesPattern Nothing
+  lift $ matchMultiLang (rules' cfg) (rules' cfg) Nothing pagesPattern
 
   where
     rules' cfg locale =
