@@ -1,20 +1,21 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module W7W.Pictures.Rules where
 
-import Data.Monoid ((<>))
-import qualified Data.Text as T
+import           Data.Monoid                   ((<>))
+import qualified Data.Text                     as T
 
-import System.FilePath
-import System.FilePath.Posix ((</>), takeBaseName)
+import           System.FilePath
+import           System.FilePath.Posix         (takeBaseName, (</>))
 
-import Hakyll
-import Hakyll.Core.Compiler.Internal (compilerThrow, compilerAsk, compilerConfig)
+import           Hakyll
+import           Hakyll.Core.Compiler.Internal (compilerAsk, compilerConfig,
+                                                compilerThrow)
 
-import W7W.Utils
-import W7W.Context
-import W7W.Pictures.Utils
+import           W7W.Context
+import           W7W.Pictures.Utils
+import           W7W.Utils
 -- import W7W.ExifInfo.Types
 -- import W7W.ExifInfo
 -- import W7W.MultiLang (localize, itemLocale, isLocalized, Localized, IsLocalized)
@@ -49,23 +50,23 @@ data PictureTypeStrategy =
   | PicResizeStrategy (Int, Int) deriving (Show)
 
 data PicturesRulesConfig =
-  PicturesRulesConfig { pngStrategy :: PictureTypeStrategy
-                      , gifStrategy :: PictureTypeStrategy
-                      , mp4Strategy :: PictureTypeStrategy
+  PicturesRulesConfig { pngStrategy    :: PictureTypeStrategy
+                      , gifStrategy    :: PictureTypeStrategy
+                      , videoStrategy  :: PictureTypeStrategy
                       , othersStrategy :: PictureTypeStrategy
                       } deriving (Show)
 
 copyAllPicturesRulesConfig =
   PicturesRulesConfig { pngStrategy = PicCopyStrategy
                       , gifStrategy = PicCopyStrategy
-                      , mp4Strategy = PicCopyStrategy
+                      , videoStrategy = PicCopyStrategy
                       , othersStrategy = PicCopyStrategy }
 
 resizeAllPicturesRulesConfig :: (Int, Int) -> PicturesRulesConfig
 resizeAllPicturesRulesConfig size =
   PicturesRulesConfig { pngStrategy = PicResizeStrategy size
                       , gifStrategy = PicResizeStrategy size
-                      , mp4Strategy = PicCopyStrategy                      
+                      , videoStrategy = PicCopyStrategy
                       , othersStrategy = PicResizeStrategy size }
 
 
@@ -73,18 +74,21 @@ picturesRules :: PicturesRulesConfig -> FilePath -> Rules ()
 picturesRules config basePath = do
   picturesRules' (pngStrategy config) pngPattern
   picturesRules' (gifStrategy config) gifPattern
-  picturesRules' (mp4Strategy  config) mp4Pattern
+  picturesRules' (videoStrategy  config) videoPattern
   picturesRules' (othersStrategy config) othersPattern
   where
     mkPattern mExt = fromGlob $ basePath </> ("**/*" ++ (maybe "" id mExt))
     pngPattern = (mkPattern (Just ".png")) .||. (mkPattern (Just ".PNG"))
     gifPattern = (mkPattern (Just ".gif")) .||. (mkPattern (Just ".GIF"))
-    mp4Pattern = (mkPattern (Just ".mp4")) .||. (mkPattern (Just ".MP4"))
-    othersPattern = (fromGlob $ basePath </> "**/*") .&&. (complement (pngPattern .||. gifPattern .||. mp4Pattern))
+    videoPattern = (mkPattern (Just ".mp4"))
+                   .||. (mkPattern (Just ".MP4"))
+                   .||. (mkPattern (Just ".m4v"))
+                   .||. (mkPattern (Just ".M4V"))
+    othersPattern = (fromGlob $ basePath </> "**/*") .&&. (complement (pngPattern .||. gifPattern .||. videoPattern))
 
     picturesRules' :: PictureTypeStrategy -> Pattern -> Rules ()
-    picturesRules' PicCopyStrategy = copyPicturesRules'
-    picturesRules' (PicResizeStrategy size) = resizePicturesRules' size 
+    picturesRules' PicCopyStrategy          = copyPicturesRules'
+    picturesRules' (PicResizeStrategy size) = resizePicturesRules' size
 
 
 
@@ -100,11 +104,11 @@ resizePicturesRules' (w, h) p = do
     route (customRoute pictureRoute)
     compile $ convertItem
   where
-    
+
     convertItem = do
       i <- getUnderlying
       dstBase <- return . destinationDirectory . compilerConfig =<< compilerAsk
-      destPath <- getUnderlying 
+      destPath <- getUnderlying
                   >>= getRoute >>= maybe (compilerThrow $ ["no route for: " ++ (toFilePath i)] ) return >>= return . (</>) dstBase
       srcPath <- getResourceFilePath
       r0 <- unsafeCompiler (makeDirectories destPath)

@@ -33,7 +33,7 @@ jsRules =
 
 
 cssAndSassRules :: Pattern -> [Pattern] -> Rules ()
-cssAndSassRules scssDepsPattern  scssFiles =
+cssAndSassRules scssDepsPattern  scssFilePatterns =
   do
     match scssDepsPattern $
       compile getResourceBody
@@ -42,7 +42,7 @@ cssAndSassRules scssDepsPattern  scssFiles =
     --
     -- app
     --
-    mapM_ (scssRulesWithDeps scssDeps) scssFiles
+    mapM_ (scssRulesWithDeps scssDeps) scssFilePatterns
 
     --
     -- all css files
@@ -51,6 +51,10 @@ cssAndSassRules scssDepsPattern  scssFiles =
       route idRoute
       compile compressCssCompiler
   where
+    -- -- make file list from file patterns
+    -- scssFiles =
+    --   do
+         
     scssRulesWithDeps scssDeps p =
       rulesExtraDependencies [scssDeps] $
         match p scssRules
