@@ -3,6 +3,7 @@ module W7W.Labels.Context where
 
 import Hakyll
 
+import Control.Monad
 import Control.Monad.Error.Class
 import Control.Monad.Reader
 import W7W.MonadCompiler

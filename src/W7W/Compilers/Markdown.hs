@@ -63,8 +63,10 @@ customPandocCompiler = do
   W7WPandoc.pandocCompilerWith customReaderOptions (customWriterOptions m) 
 
 
--- FIXME: unused???
--- customRenderPandoc = W7WPandoc.renderPandocWith customReaderOptions customRenderPandoc
+customRenderPandoc :: Item String -> Compiler (Item String)
+customRenderPandoc i = do
+  m <- getMetadata =<< getUnderlying
+  W7WPandoc.renderPandocWith customReaderOptions (customWriterOptions m) i
 
 -- --
 -- -- from here
