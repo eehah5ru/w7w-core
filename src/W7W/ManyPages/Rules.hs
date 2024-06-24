@@ -16,7 +16,9 @@ import W7W.ManyPages.Context
 import qualified W7W.ManyPages.Config as MPC
 
 
-indexPageRules :: Config -> Rules ()
+indexPageRules
+  :: Config
+  -> Rules ()
 indexPageRules cfg = execManyPages cfg $ do
   indexPagePath <- asks (unIndexPagePath . MPC.indexPagePath)
   cfg <- ask
@@ -24,15 +26,21 @@ indexPageRules cfg = execManyPages cfg $ do
   lift $ matchMultiLang (rules' cfg) (rules' cfg) Nothing (indexPagePath)
 
   where
-    rules' :: MPC.Config -> Locale -> Rules ()
+    rules'
+      :: MPC.Config
+      -> Locale
+      -> Rules ()
     rules' cfg locale = do
       markdownPageRules $ \x -> execManyPages cfg $ do
           ctx <- mkIndexPageCtx
           renderer <- asks MPC.rendererIndexPage
           lift $ renderer ctx x
 
-pageRules :: Config -> Rules ()
-pageRules cfg  = execManyPages cfg $ do
+pageRules
+  :: Config
+  -> Rules ()
+pageRules cfg
+  = execManyPages cfg $ do
   pagesPattern <- asks (unPagesPattern . MPC.pagesPattern)
   cfg <- ask
 

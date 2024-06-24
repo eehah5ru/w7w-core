@@ -17,7 +17,14 @@ import W7W.MultiLang
 
 import W7W.Utils
 
+import W7W.Labels.Types
 import qualified W7W.Cache as Cache
+
+
+-- type SiteCtxFactory = (MonadReader r m, MonadCompiler m, Cache.HasCache r, HasLabels r) => m (Context String)
+
+type SiteCtxFactory = Cache.Caches -> Labels -> Compiler (Context String)
+
 --
 --
 -- utils

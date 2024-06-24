@@ -1,0 +1,90 @@
+cabal-version: 3.4
+name: w7w
+version: 0.1.0.0
+author: eeefff
+maintainer: eeefff@riseup.net
+category: Web
+license: MIT
+license-file: LICENSE
+extra-doc-files: CHANGELOG.md
+build-type: Simple
+
+common warnings
+  ghc-options: -Wall
+
+library
+  import: warnings
+  hs-source-dirs: src
+  exposed-modules:
+    W7W.Cache
+    W7W.Compilers.Coffee
+    W7W.Compilers.Markdown
+    W7W.Compilers.Slim
+    W7W.Compilers.W7WPandoc
+    W7W.Config
+    W7W.Context
+    W7W.Context.Media
+    W7W.ExifInfo
+    W7W.ExifInfo.Parser
+    W7W.ExifInfo.Types
+    W7W.HasVersion
+    W7W.HasVersion.Context
+    W7W.Labels.Context
+    W7W.Labels.Parser
+    W7W.Labels.Types
+    W7W.ManyPages
+    W7W.ManyPages.Config
+    W7W.ManyPages.Context
+    W7W.ManyPages.Rules
+    W7W.MonadCompiler
+    W7W.MultiLang
+    W7W.PictureColor
+    W7W.PictureColor.Operations
+    W7W.PictureColor.Parser
+    W7W.PictureColor.Types
+    W7W.Pictures.Context
+    W7W.Pictures.Rules
+    W7W.Pictures.Utils
+    W7W.Rules.Assets
+    W7W.Rules.StaticPages
+    W7W.Rules.Templates
+    W7W.Types
+    W7W.Typography
+    W7W.Utils
+
+  build-depends: base                >=4     && <5
+               , filepath
+               , hakyll              >=4.16  && <4.17
+               , hakyll-sass         >=0.2   && <0.3
+               , text
+               , yaml
+               , attoparsec
+               , containers
+               , mtl
+               , transformers
+               , pandoc
+               , colour
+               , aeson
+               , hsass               ==0.8.0
+               , data-default
+               , cache
+               , hashable
+               , bytestring
+               , string-conversions
+               , binary
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  default-language: Haskell2010

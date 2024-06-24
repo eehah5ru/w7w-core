@@ -18,6 +18,7 @@ import W7W.Utils
 import W7W.Labels.Types
 
 import qualified W7W.Cache as Cache
+import W7W.Context (SiteCtxFactory)
 
 newtype PagesPattern = PagesPattern {unPagesPattern :: FilePath}
 
@@ -50,6 +51,7 @@ data Config = Config { indexPagePath :: IndexPagePath
                      , pageCtxFields :: CtxFields
                      , cache :: Cache.Caches
                      , labels :: Labels
+                     , siteCtxFactory :: SiteCtxFactory
                      }
 
 class HasPagesPattern a where

@@ -17,7 +17,7 @@ import qualified W7W.Cache as Cache
 
 import W7W.MonadCompiler
 
-import Site.Context
+-- import Site.Context
 
 import W7W.Context (sortByOrder)
 
@@ -57,14 +57,24 @@ mkPagesField = do
 mkPageCtx :: ManyPages Compiler (Context String)
 mkPageCtx = do
   c <- asks MPC.cache
+  l <- asks MPC.labels
+  mkCtx <- asks MPC.siteCtxFactory
+  siteCtx <- liftCompiler $ mkCtx c l
   fields' <- asks MPC.pageCtxFields
-  liftA2 (<>) siteCtx fields'
+  fields <- fields'
+  -- undefined
+  return $ siteCtx <> fields
 
 --
 -- index page ctx
 --
 mkIndexPageCtx :: ManyPages Compiler (Context String)
 mkIndexPageCtx = do
-  ctx <- siteCtx
+  c <- asks MPC.cache
+  l <- asks MPC.labels
+  mkCtx <- asks MPC.siteCtxFactory
+  siteCtx <- liftCompiler $ mkCtx c l
   pages <- mkPagesField
-  return $ pages <> ctx
+  return $ pages <> siteCtx
+
+-- siteCtx = undefined
